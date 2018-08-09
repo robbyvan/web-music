@@ -55,8 +55,8 @@ export default {
     _setSliderWidth(isResize) {
       this.children = this.$refs.sliderGroup.children;
 
-      let width = 0,
-          sliderWidth = this.$refs.slider.clientWidth;
+      let width = 0;
+      const sliderWidth = this.$refs.slider.clientWidth;
       for (let i = 0; i < this.children.length; ++i) {
         let child = this.children[i];
         addClass(child, 'slider-item');

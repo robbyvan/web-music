@@ -28,7 +28,7 @@ module.exports = {
     "semi": ["warn", "always"],
     "space-before-function-paren": ["warn", "never"],
     "comma-dangle": ["warn", "only-multiline"],
-    "one-var": ["warn", "consecutive"],
-    indent: ["error", 2, { "VariableDeclarator": 2 }]
+    // "one-var": ["warn", "consecutive"],
+    // indent: ["error", 2, { "VariableDeclarator": 2 }]
   }
 }
