@@ -1,18 +1,23 @@
 <template>
   <div id="app">
-    hello
+    <MHeader />
   </div>
 </template>
 
 <script>
+import MHeader from 'components/m-header/m-header.vue';
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    MHeader
+  }
 };
 </script>
 
 <style lang="scss" scoped>
-  @import "common/scss/const.scss";
-  #app {
-    color: $color-theme;
-  }
+@import "common/scss/const.scss";
+
+#app {
+  color: $color-theme;
+}
 </style>
