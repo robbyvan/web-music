@@ -1,15 +1,19 @@
 <template>
   <div id="app">
-    <MHeader />
+    <m-header />
+    <tab />
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 import MHeader from 'components/m-header/m-header.vue';
+import Tab from 'components/tab/tab';
 export default {
   name: 'App',
   components: {
-    MHeader
+    MHeader,
+    Tab
   }
 };
 </script>
@@ -17,7 +21,4 @@ export default {
 <style lang="scss" scoped>
 @import "common/scss/const.scss";
 
-#app {
-  color: $color-theme;
-}
 </style>
