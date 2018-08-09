@@ -17,8 +17,8 @@ export default function jsonp(url, data, option) {
 function createQuery(data) {
   let url = '';
   for (let key in data) {
-    let value = data[k] !== undefined ? data[k] : '';
-    url += `&${k}=${encodeURIComponent(value)}`;
+    let value = data[key] !== undefined ? data[key] : '';
+    url += `&${key}=${encodeURIComponent(value)}`;
   }
   return url ? url.substring(1) : '';
 }
