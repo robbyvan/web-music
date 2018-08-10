@@ -34,6 +34,10 @@
           <div class="progress-wrapper">
             <span class="time time-l">{{ format(currentTime) }}</span>
             <div class="progress-bar-wrapper">
+                <progress-bar
+                  :percent="percent"
+                  @percentChange="onProgressBarChange"
+                />
             </div>
             <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
@@ -92,10 +96,14 @@
 import { mapGetters, mapMutations } from 'vuex';
 import animations from 'create-keyframe-animation';
 import { prefixStyle } from 'common/js/dom';
+import ProgressBar from 'base/progress-bar/progress-bar';
 
 const transform = prefixStyle('transform');
 
 export default {
+  components: {
+    ProgressBar,
+  },
   data() {
     return {
       songReady: false,
@@ -121,6 +129,10 @@ export default {
     },
     disableCls() {
       return this.songReady ? '' : 'disable';
+    },
+    // 进度条
+    percent() {
+      return this.currentTime / this.currentSong.duration;
     }
   },
   watch: {
@@ -186,6 +198,12 @@ export default {
     },
     updateTime(e) {
       this.currentTime = e.target.currentTime;
+    },
+    onProgressBarChange(percent) {
+      this.$refs.audio.currentTime = this.currentSong.duration * percent;
+      // if (!this.playing) {
+      //   this.togglePlaying();
+      // }
     },
     // UI
     back() {
@@ -417,9 +435,9 @@ export default {
         .time {
           color: $color-text;
           font-size: $font-size-small;
-          flex: 0 0 30px;
+          flex: 0 0 35px;
           line-height: 30px;
-          width: 30px;
+          width: 35px;
           &.time-l {
             text-align: left;
             margin-right: 5px;
