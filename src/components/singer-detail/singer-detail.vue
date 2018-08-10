@@ -1,20 +1,39 @@
 <template>
   <transition name="slide">
     <div class="singer-detail">
-      子!
+      <music-list
+        :songs="songs"
+        :bg-image="bgImage"
+        :title="title"
+      />
     </div>
   </transition>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import MusicList from 'components/music-list/music-list';
 import { getSingerDetail } from 'api/singer';
 import { ERR_OK } from 'api/config';
 import { createSong } from 'common/js/song';
 
 export default {
+  components: {
+    MusicList,
+  },
+  data() {
+    return {
+      songs: [],
+    };
+  },
   computed: {
-    ...mapGetters(['singer'])
+    ...mapGetters(['singer']),
+    title() {
+      return this.singer.name;
+    },
+    bgImage() {
+      return this.singer.avatar;
+    }
   },
   created() {
     console.log(this.singer);
@@ -50,15 +69,15 @@ export default {
 <style lang="scss">
 @import 'common/scss/const.scss';
 
-.singer-detail {
-  position: fixed;
-  z-index: 100;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: $color-background;
-}
+// .singer-detail {
+//   position: fixed;
+//   z-index: 99;
+//   top: 0;
+//   left: 0;
+//   right: 0;
+//   bottom: 0;
+//   background: $color-background;
+// }
 
 .slide-enter-active, .slide-leave-active {
   transition: all .3s ease;
