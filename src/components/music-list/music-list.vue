@@ -2,14 +2,27 @@
   <div class="music-list">
     <div class="back"><i class="icon-back"></i></div>
     <h1 class="title" v-html="title"></h1>
-    <div class="bg-image" :style="bgStyle">
+    <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="filter"></div>
     </div>
+    <scroll :data="songs" class="list" ref="songList">
+      <div class="song-list-wrapper">
+        <song-list :songs="songs" />
+      </div>
+    </scroll>
   </div>
 </template>
 
 <script>
+import Scroll from 'base/scroll/scroll';
+import SongList from 'base/song-list/song-list';
+// import Loading from '@/components/base/loading/loading';
+
 export default {
+  components: {
+    Scroll,
+    SongList,
+  },
   props: {
     bgImage: { type: String, default: '' },
     songs: { type: Array, default: () => [] },
@@ -19,6 +32,9 @@ export default {
     bgStyle() {
       return `background-image:url(${this.bgImage})`;
     }
+  },
+  mounted() {
+    this.$refs.songList.$el.style.top = `${this.$refs.bgImage.clientHeight}px`;
   }
 };
 </script>
@@ -109,6 +125,7 @@ export default {
     background: $color-background;
   }
   .list {
+    overflow: hidden;
     position: fixed;
     top: 0;
     bottom: 0;
