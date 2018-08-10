@@ -46,9 +46,9 @@ export default {
       }
       getSingerDetail(this.singer.id).then(res => {
         if (res.code === ERR_OK) {
-          console.log(res.data.list);
+          // console.log(res.data.list);
           this.songs = this._normalizeSongs(res.data.list);
-          console.log(this.songs);
+          // console.log(this.songs);
         }
       });
     },
@@ -69,15 +69,15 @@ export default {
 <style lang="scss">
 @import 'common/scss/const.scss';
 
-// .singer-detail {
-//   position: fixed;
-//   z-index: 99;
-//   top: 0;
-//   left: 0;
-//   right: 0;
-//   bottom: 0;
-//   background: $color-background;
-// }
+.singer-detail {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-background;
+}
 
 .slide-enter-active, .slide-leave-active {
   transition: all .3s ease;
