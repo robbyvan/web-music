@@ -29,7 +29,7 @@
       @scroll="scroll"
     >
       <div class="song-list-wrapper">
-        <song-list :songs="songs" />
+        <song-list :songs="songs" @select="selectItem" />
       </div>
 
       <div class="loading-container" v-show="!songs.length">
@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import Scroll from 'base/scroll/scroll';
 import SongList from 'base/song-list/song-list';
 import Loading from 'base/loading/loading';
@@ -112,6 +113,15 @@ export default {
     this.$refs.songList.$el.style.top = `${this.$refs.bgImage.clientHeight}px`;
   },
   methods: {
+    ...mapActions([
+      'selectPlay'
+    ]),
+    selectItem(item, index) {
+      this.selectPlay({
+        list: this.songs,
+        index: index,
+      });
+    },
     scroll(pos) {
       this.scrollY = pos.y;
     },
