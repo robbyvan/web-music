@@ -12,6 +12,7 @@ export default {
     probeType: { type: Number, default: 1 },
     click: { type: Boolean, default: true },
     data: { type: Array, default: null },
+    listenScroll: { type: Boolean, default: false },
   },
   mounted() {
     setTimeout(() => {
@@ -28,6 +29,14 @@ export default {
         probeType: this.probeType,
         click: this.click,
       });
+
+      if (this.listenScroll) {
+        const self = this;
+        // 时间this默认指向了scroll, 需要vue实例$emit.
+        this.scroll.on('scroll', pos => {
+          self.$emit('scroll', pos);
+        });
+      }
     },
     enable() {
       this.scroll && this.scroll.enable();
@@ -37,6 +46,12 @@ export default {
     },
     refresh() {
       this.scroll && this.scroll.refresh();
+    },
+    scrollTo() {
+      this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments);
+    },
+    scrollToElement() {
+      this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments);
     }
   },
   watch: {
