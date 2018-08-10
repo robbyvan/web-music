@@ -10,8 +10,8 @@
 <script>
 export default {
   components: {},
-  data () {
-    return {}
+  data() {
+    return {};
   },
   props: {
     title: {
@@ -21,10 +21,10 @@ export default {
   },
   watch: {},
   methods: {},
-  created () {},
-  mounted () {},
-  destroyed () {}
-}
+  created() {},
+  mounted() {},
+  destroyed() {}
+};
 </script>
 
 <style lang="scss" scoped>
