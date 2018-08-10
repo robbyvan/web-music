@@ -23,7 +23,7 @@
         <div class="middle">
           <div class="middle-l">
             <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd">
+              <div class="cd" :class="cdCls">
                 <img :src="currentSong.img" class="image" />
               </div>
             </div>
@@ -31,18 +31,24 @@
         </div>
 
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l">{{ format(currentTime) }}</span>
+            <div class="progress-bar-wrapper">
+            </div>
+            <span class="time time-r">{{ format(currentSong.duration) }}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left">
-              <i class="icon-prev"></i>
+            <div class="icon i-left" :class="disableCls">
+              <i class="icon-prev" @click="prev"></i>
             </div>
-            <div class="icon i-center">
-              <i class="icon-play"></i>
+            <div class="icon i-center" :class="disableCls">
+              <i :class="playIcon" @click="togglePlaying"></i>
             </div>
-            <div class="icon i-right">
-              <i class="icon-next"></i>
+            <div class="icon i-right" :class="disableCls">
+              <i class="icon-next" @click="next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon icon-not-favorite"></i>
@@ -55,7 +61,7 @@
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
-          <img :src="currentSong.img" width="40" height="40" />
+          <img :src="currentSong.img" width="40" height="40" :class="cdCls"/>
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
@@ -63,10 +69,22 @@
         </div>
 
         <div class="control">
+          <i :class="miniIcon" @click.stop="togglePlaying"></i>
+        </div>
+
+        <div class="control">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+
+    <audio
+      ref="audio"
+      :src="currentSong.url"
+      @canplay="ready"
+      @error="error"
+      @timeupdate="updateTime"
+    ></audio>
   </div>
 </template>
 
@@ -78,17 +96,98 @@ import { prefixStyle } from 'common/js/dom';
 const transform = prefixStyle('transform');
 
 export default {
+  data() {
+    return {
+      songReady: false,
+      currentTime: 0,
+    };
+  },
   computed: {
     ...mapGetters([
       'fullScreen',
       'playlist',
       'currentSong',
-    ])
+      'playing',
+      'currentIndex',
+    ]),
+    playIcon() {
+      return this.playing ? 'icon-pause' : 'icon-play';
+    },
+    miniIcon() {
+      return this.playing ? 'icon-pause-mini' : 'icon-play-mini';
+    },
+    cdCls() {
+      return this.playing ? 'play' : 'play pause';
+    },
+    disableCls() {
+      return this.songReady ? '' : 'disable';
+    }
+  },
+  watch: {
+    currentSong() {
+      // 需要在dom ready之后才能play.
+      this.$nextTick(() => {
+        this.$refs.audio.play();
+      });
+    },
+    playing(shouldPlay) {
+      const audio = this.$refs.audio;
+      this.$nextTick(() => {
+        shouldPlay ? audio.play() : audio.pause();
+      });
+    }
   },
   methods: {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
+      setPlayingState: 'SET_PLAYING_STATE',
+      setCurrentIndex: 'SET_CURRENT_INDEX'
     }),
+    // 播放器
+    togglePlaying() {
+      if (!this.songReady) {
+        return;
+      }
+      this.setPlayingState(!this.playing);
+    },
+    ready() {
+      this.songReady = true;
+    },
+    error() {
+      this.songReady = true;
+    },
+    next() {
+      if (!this.songReady) {
+        return;
+      }
+      let index = this.currentIndex + 1;
+      if (index === this.playlist.length) {
+        index = 0;
+      }
+      this.setCurrentIndex(index);
+      if (!this.playing) {
+        this.togglePlaying();
+      }
+      this.songReady = false;
+    },
+    prev() {
+      if (!this.songReady) {
+        return;
+      }
+      let index = this.currentIndex - 1;
+      if (index === -1) {
+        index = this.playlist.length - 1;
+      }
+      this.setCurrentIndex(index);
+      if (!this.playing) {
+        this.togglePlaying();
+      }
+      this.songReady = false;
+    },
+    updateTime(e) {
+      this.currentTime = e.target.currentTime;
+    },
+    // UI
     back() {
       this.setFullScreen(false);
     },
@@ -135,7 +234,21 @@ export default {
       // 总高 - 顶部 - 半径 - 小图标偏移
       const y = window.innerHeight - paddingTop - width / 2 - paddingBottom;
       return { x, y, scale };
-    }
+    },
+    _pad(num, n = 2) {
+      let len = num.toString().length;
+      while (len < n) {
+        num = `0${num}`;
+        len++;
+      }
+      return num;
+    },
+    format(interval) {
+      interval = interval | 0; // Math.floor
+      const minute = this._pad(interval / 60 | 0);
+      const sec = this._pad(interval % 60);
+      return `${minute}:${sec}`;
+    },
   }
 };
 </script>

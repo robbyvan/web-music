@@ -11,8 +11,7 @@ const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 
 const axios = require('axios');
-// const express = require('express');
-// const apiRoutes = express.Router();
+const bodyParser = require('body-parser');
 
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
@@ -27,6 +26,10 @@ const devWebpackConfig = merge(baseWebpackConfig, {
   // these devServer options should be customized in /config/index.js
   devServer: {
     before(apiRoutes){
+      apiRoutes.use(bodyParser.urlencoded({ extended: true }));
+      const queryString = require('querystring');
+
+      // 获取推荐歌单
       apiRoutes.get('/api/getRecommendList', (req, res) => {
         const url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg';
         axios.get(url, {
@@ -39,23 +42,23 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           .then(response => res.json(response.data))
           .catch(e => console.log(e));
       });
-      // console.log('before!');
-      // apiRoutes.get('/api/getDiscList',(req,res)=>{
-      //   const url = 'http://127.0.0.1:3000';
-      //   axios.get(url, {
-      //     headers: {
-      //       referer: 'https:/c.y.qq.com/',
-      //       host: 'c.y.qq.com'
-      //     },
-      //     params: req.query  //这是请求的query
-      //   }).then((response) => {
-      //   //response是api地址返回的，数据在data里。
-      //     res.json(response.data)
-      //   }).catch((e) => {
-      //     console.log(e);
-      //   })
-      // });
-     },
+
+      // 获取音乐地址
+      apiRoutes.post('/api/getPurlUrl', bodyParser.json(), function (req, res) {
+        const url = 'https://u.y.qq.com/cgi-bin/musicu.fcg'
+        axios.post(url, req.body, {
+          headers: {
+            referer: 'https://y.qq.com/',
+            origin: 'https://y.qq.com',
+            'Content-type': 'application/x-www-form-urlencoded'
+          }
+        }).then((response) => {
+          res.json(response.data)
+        }).catch((e) => {
+          console.log(e)
+        })
+      });
+    },
     clientLogLevel: 'warning',
     historyApiFallback: {
       rewrites: [
