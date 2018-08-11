@@ -7,11 +7,13 @@
       @leave="leave"
       @after-leave="afterLeave"
     >
+      <!-- 全屏播放器 -->
       <div class="normal-player" v-show="fullScreen">
         <div class="background">
           <img width="100%" height="100%" :src="currentSong.img" />
         </div>
 
+        <!-- 页面顶部 -->
         <div class="top">
           <div class="back" @click="back">
             <i class="icon-back"></i>
@@ -20,8 +22,15 @@
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
 
-        <div class="middle">
-          <div class="middle-l">
+        <!-- 页面中部 -->
+        <div
+          class="middle"
+          @touchstart.prevent="middleTouchStart"
+          @touchmove.prevent="middleTouchMove"
+          @touchend="middleTouchEnd"
+        >
+          <!-- 专辑封面 -->
+          <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd" :class="cdCls">
                 <img :src="currentSong.img" class="image" />
@@ -29,6 +38,7 @@
             </div>
           </div>
 
+          <!-- 歌词页 -->
           <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
             <div class="lyric-wrapper">
               <div v-if="currentLyric">
@@ -43,6 +53,13 @@
         </div>
 
         <div class="bottom">
+          <!-- 专辑封面&歌词页 切换dots -->
+          <div class="dot-wrapper">
+            <span class="dot" :class="{'active': currentShow === 'cd' }"></span>
+            <span class="dot" :class="{'active': currentShow === 'lyric' }"></span>
+          </div>
+
+          <!-- 播放进度条 -->
           <div class="progress-wrapper">
             <span class="time time-l">{{ format(currentTime) }}</span>
             <div class="progress-bar-wrapper">
@@ -53,6 +70,8 @@
             </div>
             <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
+
+          <!-- 播放按钮 -->
           <div class="operators">
             <div class="icon i-left" @click="changeMode">
               <i :class="iconMode"></i>
@@ -74,6 +93,7 @@
       </div>
     </transition>
 
+    <!-- 最小化播放器 -->
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
@@ -96,6 +116,7 @@
       </div>
     </transition>
 
+    <!-- 实际播放器 -->
     <audio
       ref="audio"
       :src="currentSong.url"
@@ -119,6 +140,7 @@ import { shuffle } from 'common/js/util';
 import Lyric from 'lyric-parser';
 
 const transform = prefixStyle('transform');
+const transitionDuration = prefixStyle('transitionDuration');
 
 export default {
   components: {
@@ -133,6 +155,7 @@ export default {
       radius: 32,
       currentLyric: null,
       currentLineNum: 0,
+      currentShow: 'cd',
     };
   },
   computed: {
@@ -186,6 +209,9 @@ export default {
         shouldPlay ? audio.play() : audio.pause();
       });
     }
+  },
+  created() {
+    this.touch = {};
   },
   methods: {
     ...mapMutations({
@@ -264,6 +290,60 @@ export default {
       } else {
         this.$refs.lyricList.scrollTo(0, 0, 1000);
       }
+    },
+    middleTouchStart(e) {
+      this.touch.initiated = true;
+      const touch = e.touches[0];
+      this.touch.startX = touch.pageX;
+      this.touch.startY = touch.pageY;
+    },
+    middleTouchMove(e) {
+      if (!this.touch.initiated) {
+        return;
+      }
+      const touch = e.touches[0];
+      const deltaX = touch.pageX - this.touch.startX;
+      const deltaY = touch.pageY - this.touch.startY; // Y轴? 歌词是Y移动, 判断当前是滑动歌词还是切屏
+      if (Math.abs(deltaY) > Math.abs(deltaX)) {
+        // 滑动歌词的时候X不能移动
+        return;
+      }
+      const left = this.currentShow === 'cd' ? 0 : -window.innerWidth;
+      const offsetWidth = Math.min(Math.max(-window.innerWidth, left + deltaX), 0);
+      this.touch.percent = Math.abs(offsetWidth / window.innerWidth);
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
+      this.$refs.lyricList.$el.style[transitionDuration] = 0;
+      this.$refs.middleL.style.opacity = 1 - this.touch.percent;
+      this.$refs.middleL.style[transitionDuration] = 0;
+    },
+    middleTouchEnd() {
+      this.touch.initiated = false;
+      let offsetWidth;
+      let opacity;
+      if (this.currentShow === 'cd') {
+        if (this.touch.percent > 0.1) {
+          offsetWidth = -window.innerWidth;
+          opacity = 0;
+          this.currentShow = 'lyric';
+        } else {
+          offsetWidth = 0;
+          opacity = 1;
+        }
+      } else {
+        if (this.touch.percent < 0.9) {
+          offsetWidth = 0;
+          opacity = 1;
+          this.currentShow = 'cd';
+        } else {
+          offsetWidth = -window.innerWidth;
+          opacity = 0;
+        }
+      }
+      const animTime = 300;
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
+      this.$refs.lyricList.$el.style[transitionDuration] = `${animTime}ms`;
+      this.$refs.middleL.style.opacity = opacity;
+      this.$refs.middleL.style[transitionDuration] = `${animTime}ms`;
     },
     onProgressBarChange(percent) {
       this.$refs.audio.currentTime = this.currentSong.duration * percent;
@@ -506,9 +586,9 @@ export default {
           border-radius: 50%;
           background: $color-text-l;
           &.active {
-            width: 20px;
-            border-radius: 5px;
-            background: $color-text-ll;
+            // width: 20px;
+            // border-radius: 5px;
+            background: $color-theme;
           }
         }
       }
