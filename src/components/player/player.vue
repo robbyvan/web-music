@@ -36,6 +36,10 @@
                 <img :src="currentSong.img" class="image" />
               </div>
             </div>
+            <!-- 当前歌词 -->
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{ playingLyric }}</div>
+            </div>
           </div>
 
           <!-- 歌词页 -->
@@ -156,6 +160,7 @@ export default {
       currentLyric: null,
       currentLineNum: 0,
       currentShow: 'cd',
+      playingLyric: '',
     };
   },
   computed: {
@@ -198,10 +203,19 @@ export default {
       if (newSong.id === oldSong.id) {
         return;
       }
-      this.$nextTick(() => {
+      if (this.currentLyric) {
+        // 切歌时清除上一首歌的歌词计时器
+        this.currentLyric.stop();
+      }
+      // this.$nextTick(() => {
+      //   this.$refs.audio.play();
+      //   this.getLyric();
+      // });
+      // setTimeout更慢, 保证手机后台切换时songReady正常,歌曲能成功播放
+      setTimeout(() => {
         this.$refs.audio.play();
         this.getLyric();
-      });
+      }, 1000);
     },
     playing(shouldPlay) {
       const audio = this.$refs.audio;
@@ -227,6 +241,9 @@ export default {
         return;
       }
       this.setPlayingState(!this.playing);
+      if (this.currentLyric) {
+        this.currentLyric.togglePlay();
+      }
     },
     ready() {
       this.songReady = true;
@@ -245,13 +262,18 @@ export default {
       if (!this.songReady) {
         return;
       }
-      let index = this.currentIndex + 1;
-      if (index === this.playlist.length) {
-        index = 0;
-      }
-      this.setCurrentIndex(index);
-      if (!this.playing) {
-        this.togglePlaying();
+      // 边界情况: 只有一首歌, 调用next = loop
+      if (this.playlist.length === 1) {
+        this.loop();
+      } else {
+        let index = this.currentIndex + 1;
+        if (index === this.playlist.length) {
+          index = 0;
+        }
+        this.setCurrentIndex(index);
+        if (!this.playing) {
+          this.togglePlaying();
+        }
       }
       this.songReady = false;
     },
@@ -259,13 +281,18 @@ export default {
       if (!this.songReady) {
         return;
       }
-      let index = this.currentIndex - 1;
-      if (index === -1) {
-        index = this.playlist.length - 1;
-      }
-      this.setCurrentIndex(index);
-      if (!this.playing) {
-        this.togglePlaying();
+      // 边界情况: 只有一首歌, 调用next = loop
+      if (this.playlist.length === 1) {
+        this.loop();
+      } else {
+        let index = this.currentIndex - 1;
+        if (index === -1) {
+          index = this.playlist.length - 1;
+        }
+        this.setCurrentIndex(index);
+        if (!this.playing) {
+          this.togglePlaying();
+        }
       }
       this.songReady = false;
     },
@@ -280,6 +307,12 @@ export default {
             this.currentLyric.play();
           }
           // console.log(this.currentLyric);
+        })
+        .catch(() => {
+          // 异常处理
+          this.currentLyric = null;
+          this.playingLyric = '';
+          this.currentLineNum = 0;
         });
     },
     handleLyric({ lineNum, txt }) {
@@ -290,6 +323,7 @@ export default {
       } else {
         this.$refs.lyricList.scrollTo(0, 0, 1000);
       }
+      this.playingLyric = txt;
     },
     middleTouchStart(e) {
       this.touch.initiated = true;
@@ -346,9 +380,13 @@ export default {
       this.$refs.middleL.style[transitionDuration] = `${animTime}ms`;
     },
     onProgressBarChange(percent) {
-      this.$refs.audio.currentTime = this.currentSong.duration * percent;
+      const currentTime = this.currentSong.duration * percent;
+      this.$refs.audio.currentTime = currentTime;
       if (!this.playing) {
         this.togglePlaying();
+      }
+      if (this.currentLyric) {
+        this.currentLyric.seek(currentTime * 1000);
       }
     },
     changeMode() {
@@ -370,6 +408,9 @@ export default {
     loop() {
       this.$refs.audio.currentTime = 0;
       this.$refs.audio.play();
+      if (this.currentLyric) {
+        this.currentLyric.seek(0);
+      }
     },
     // UI
     back() {

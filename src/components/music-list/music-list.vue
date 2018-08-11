@@ -46,6 +46,7 @@ import Scroll from 'base/scroll/scroll';
 import SongList from 'base/song-list/song-list';
 import Loading from 'base/loading/loading';
 import { prefixStyle } from 'common/js/dom';
+import { playlistMixin } from 'common/js/mixin';
 
 const RESERVED_HEIGHT = 40;
 const transform = prefixStyle('transform');
@@ -62,6 +63,9 @@ export default {
     songs: { type: Array, default: () => [] },
     title: { type: String, default: '' },
   },
+  mixins: [
+    playlistMixin
+  ],
   data() {
     return {
       scrollY: 0,
@@ -132,7 +136,13 @@ export default {
     },
     startRandom() {
       this.randomPlay({ list: this.songs });
-    }
+    },
+    // mixins
+    handlePlaylist(playlist) {
+      const bottom = playlist.length > 0 ? '60px' : '';
+      this.$refs.songList.$el.style.bottom = bottom;
+      this.$refs.songList.refresh();
+    },
   }
 };
 </script>
