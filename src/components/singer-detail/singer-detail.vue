@@ -36,7 +36,7 @@ export default {
     }
   },
   created() {
-    console.log(this.singer);
+    // console.log(this.singer);
     this._getDetail();
   },
   methods: {
@@ -46,10 +46,10 @@ export default {
       }
       getSingerDetail(this.singer.id).then(res => {
         if (res.code === ERR_OK) {
-          console.log(res.data.list);
+          // console.log(res.data.list);
           processSongsUrl(this._normalizeSongs(res.data.list)).then((songs) => {
             this.songs = songs;
-            console.log(this.songs);
+            // console.log(this.songs);
           });
         }
       });
