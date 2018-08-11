@@ -4,12 +4,13 @@
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
 
-      <div
-        ref="playButton"
-        class="play-wrapper"
-        v-show="songs.length > 0"
-      >
-        <div class="play">
+      <div class="play-wrapper">
+        <div
+          class="play"
+          v-show="songs.length > 0"
+          ref="playButton"
+          @click="startRandom"
+        >
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
@@ -29,7 +30,7 @@
       @scroll="scroll"
     >
       <div class="song-list-wrapper">
-        <song-list :songs="songs" />
+        <song-list :songs="songs" @select="selectItem" />
       </div>
 
       <div class="loading-container" v-show="!songs.length">
@@ -40,10 +41,12 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import Scroll from 'base/scroll/scroll';
 import SongList from 'base/song-list/song-list';
 import Loading from 'base/loading/loading';
 import { prefixStyle } from 'common/js/dom';
+import { playlistMixin } from 'common/js/mixin';
 
 const RESERVED_HEIGHT = 40;
 const transform = prefixStyle('transform');
@@ -60,6 +63,9 @@ export default {
     songs: { type: Array, default: () => [] },
     title: { type: String, default: '' },
   },
+  mixins: [
+    playlistMixin
+  ],
   data() {
     return {
       scrollY: 0,
@@ -112,12 +118,31 @@ export default {
     this.$refs.songList.$el.style.top = `${this.$refs.bgImage.clientHeight}px`;
   },
   methods: {
+    ...mapActions([
+      'selectPlay',
+      'randomPlay'
+    ]),
+    selectItem(item, index) {
+      this.selectPlay({
+        list: this.songs,
+        index: index,
+      });
+    },
     scroll(pos) {
       this.scrollY = pos.y;
     },
     goback() {
       this.$router.back();
-    }
+    },
+    startRandom() {
+      this.randomPlay({ list: this.songs });
+    },
+    // mixins
+    handlePlaylist(playlist) {
+      const bottom = playlist.length > 0 ? '60px' : '';
+      this.$refs.songList.$el.style.bottom = bottom;
+      this.$refs.songList.refresh();
+    },
   }
 };
 </script>
