@@ -42,8 +42,8 @@
             <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
           <div class="operators">
-            <div class="icon i-left">
-              <i class="icon-sequence"></i>
+            <div class="icon i-left" @click="changeMode">
+              <i :class="iconMode"></i>
             </div>
             <div class="icon i-left" :class="disableCls">
               <i class="icon-prev" @click="prev"></i>
@@ -90,6 +90,7 @@
       @canplay="ready"
       @error="error"
       @timeupdate="updateTime"
+      @ended="end"
     ></audio>
   </div>
 </template>
@@ -100,6 +101,8 @@ import animations from 'create-keyframe-animation';
 import { prefixStyle } from 'common/js/dom';
 import ProgressBar from 'base/progress-bar/progress-bar';
 import ProgressCircle from 'base/progress-circle/progress-circle';
+import { playMode } from 'common/js/config';
+import { shuffle } from 'common/js/util';
 
 const transform = prefixStyle('transform');
 
@@ -122,6 +125,8 @@ export default {
       'currentSong',
       'playing',
       'currentIndex',
+      'mode',
+      'sequenceList',
     ]),
     playIcon() {
       return this.playing ? 'icon-pause' : 'icon-play';
@@ -138,11 +143,21 @@ export default {
     // 进度条
     percent() {
       return this.currentTime / this.currentSong.duration;
+    },
+    //
+    iconMode() {
+      return this.mode === playMode.sequence
+        ? 'icon-sequence'
+        : this.mode === playMode.loop
+          ? 'icon-loop' : 'icon-random';
     }
   },
   watch: {
-    currentSong() {
+    currentSong(newSong, oldSong) {
       // 需要在dom ready之后才能play.
+      if (newSong.id === oldSong.id) {
+        return;
+      }
       this.$nextTick(() => {
         this.$refs.audio.play();
       });
@@ -158,7 +173,9 @@ export default {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
-      setCurrentIndex: 'SET_CURRENT_INDEX'
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setPlayMode: 'SET_PLAY_MODE',
+      setPlayList: 'SET_PLAYLIST',
     }),
     // 播放器
     togglePlaying() {
@@ -169,6 +186,13 @@ export default {
     },
     ready() {
       this.songReady = true;
+    },
+    end() {
+      if (this.mode === playMode.loop) {
+        this.loop();
+      } else {
+        this.next();
+      }
     },
     error() {
       this.songReady = true;
@@ -206,9 +230,29 @@ export default {
     },
     onProgressBarChange(percent) {
       this.$refs.audio.currentTime = this.currentSong.duration * percent;
-      // if (!this.playing) {
-      //   this.togglePlaying();
-      // }
+      if (!this.playing) {
+        this.togglePlaying();
+      }
+    },
+    changeMode() {
+      const mode = (this.mode + 1) % 3;
+      this.setPlayMode(mode);
+      let list = null;
+      if (mode === playMode.random) {
+        list = shuffle(this.sequenceList);
+      } else {
+        list = this.sequenceList;
+      }
+      this.resetCurrentIndex(list);
+      this.setPlayList(list);
+    },
+    resetCurrentIndex(list) {
+      const index = list.findIndex(item => item.id === this.currentSong.id);
+      this.setCurrentIndex(index);
+    },
+    loop() {
+      this.$refs.audio.currentTime = 0;
+      this.$refs.audio.play();
     },
     // UI
     back() {
@@ -271,7 +315,7 @@ export default {
       const minute = this._pad(interval / 60 | 0);
       const sec = this._pad(interval % 60);
       return `${minute}:${sec}`;
-    },
+    }
   }
 };
 </script>
@@ -440,9 +484,9 @@ export default {
         .time {
           color: $color-text;
           font-size: $font-size-small;
-          flex: 0 0 35px;
+          flex: 0 0 30px;
           line-height: 30px;
-          width: 35px;
+          width: 30px;
           &.time-l {
             text-align: left;
             margin-right: 5px;
