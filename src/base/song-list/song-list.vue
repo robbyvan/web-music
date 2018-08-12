@@ -7,6 +7,9 @@
         :key="song.id"
         @click="selectItem(song, index)"
       >
+        <div class="rank" v-show="rank">
+          <span :class="getRankCls(index)">{{ getRankText(index) }}</span>
+        </div>
         <div class="content">
           <h2 class="name">{{ song.name }}</h2>
           <p class="desc">{{ getDesc(song) }}</p>
@@ -34,27 +37,19 @@ export default {
     },
     // 排行奖杯图片
     getRankCls(index) {
-      if (index === 0) {
-        return 'icon0';
-      } else if (index === 1) {
-        return 'icon1';
-      } else if (index === 2) {
-        return 'icon2';
+      if (index <= 2) {
+        return `icon icon${index}`;
       } else {
         return 'text';
       }
     },
     // 排行奖杯文案
-    getRankTxt(index) {
-      if (index > 0) {
+    getRankText(index) {
+      if (index > 2) {
         return index + 1;
       }
     }
   },
-  computed: {},
-  created() {},
-  mounted() {},
-  destroyed() {}
 };
 </script>
 

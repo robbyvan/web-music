@@ -30,7 +30,7 @@
       @scroll="scroll"
     >
       <div class="song-list-wrapper">
-        <song-list :songs="songs" @select="selectItem" />
+        <song-list :songs="songs" @select="selectItem" :rank="rank" />
       </div>
 
       <div class="loading-container" v-show="!songs.length">
@@ -62,6 +62,7 @@ export default {
     bgImage: { type: String, default: '' },
     songs: { type: Array, default: () => [] },
     title: { type: String, default: '' },
+    rank: { type: Boolean, default: false } // 排行奖杯图片
   },
   mixins: [
     playlistMixin
