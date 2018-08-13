@@ -50,13 +50,13 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapActions } from 'vuex';
 import SearchBox from 'base/search-box/search-box';
 import Suggest from 'components/suggest/suggest';
 import SearchList from 'base/search-list/search-list';
 import Confirm from 'base/confirm/confirm';
 import Scroll from 'base/scroll/scroll';
-import { playlistMixin } from 'common/js/mixin';
+import { playlistMixin, searchMixin } from 'common/js/mixin';
 import { getHotKey } from 'api/search';
 import { ERR_OK } from 'api/config';
 
@@ -71,18 +71,14 @@ export default {
   data() {
     return {
       hotKey: [],
-      query: ''
     };
   },
   computed: {
-    ...mapGetters([
-      'searchHistory'
-    ]),
     shortcut() {
       return this.hotKey.concat(this.searchHistory);
     }
   },
-  mixins: [playlistMixin],
+  mixins: [playlistMixin, searchMixin],
   watch: {
     // 解决添加歌曲后不能滚动的问题
     query(newQuery) {
@@ -98,8 +94,6 @@ export default {
   },
   methods: {
     ...mapActions([
-      'saveSearchHistory',
-      'deleteSearchHistory',
       'clearSearchHistory',
     ]),
     addQuery(q) {
@@ -107,12 +101,6 @@ export default {
     },
     updateQuery(q) {
       this.query = q;
-    },
-    blurInput() {
-      this.$refs.searchBox.blur();
-    },
-    saveSearch() {
-      this.saveSearchHistory(this.query);
     },
     showConfirm() {
       this.$refs.confirm.show();

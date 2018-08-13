@@ -9,19 +9,54 @@
         </div>
       </div>
       <!-- 搜索框 -->
-      <div class="search-box-wrapper"></div>
+      <div class="search-box-wrapper">
+        <search-box placeholder="搜索歌曲" @query="updateQuery" />
+      </div>
       <!--  -->
-      <div class="shortcut"></div>
-      <div class="search-result"></div>
+      <div class="shortcut" v-show="!query">
+        <switches
+          :switches="switches"
+          :currentIndex="currentIndex"
+          @switch="switchItem"
+        />
+      </div>
+      <!-- 搜索结果 -->
+      <div class="search-result" v-show="query">
+        <suggest
+          :query="query"
+          :showSinger="showSinger"
+          @select="selectSuggest"
+          @listsSroll="blurInput"
+        />
+      </div>
     </div>
   </transition>
 </template>
 
 <script>
+import SearchBox from 'base/search-box/search-box';
+import Suggest from 'components/suggest/suggest';
+import { searchMixin } from 'common/js/mixin';
+import Switches from 'base/switches/switches';
+// import Confirm from 'base/confirm/confirm';
+// import Scroll from 'base/scroll/scroll';
+
 export default {
+  components: {
+    SearchBox,
+    Suggest,
+    Switches
+  },
+  mixins: [searchMixin],
   data() {
     return {
       showFlag: false,
+      showSinger: false,
+      currentIndex: 0,
+      switches: [
+        { name: '最近播放' },
+        { name: '搜索历史' },
+      ]
     };
   },
   methods: {
@@ -30,6 +65,12 @@ export default {
     },
     hide() {
       this.showFlag = false;
+    },
+    selectSuggest() {
+      this.saveSearch();
+    },
+    switchItem(index) {
+      this.currentIndex = index;
     }
   },
 };
