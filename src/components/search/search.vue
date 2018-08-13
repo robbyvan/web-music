@@ -27,7 +27,7 @@
             </h1>
             <search-list
               :searches="searchHistory"
-              @click="addQuery"
+              @select="addQuery"
               @delete="deleteSearchHistory"
             />
           </div>

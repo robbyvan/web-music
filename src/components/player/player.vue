@@ -114,17 +114,20 @@
           </progress-circle>
         </div>
 
-        <div class="control">
+        <div class="control" @click.stop="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
 
+    <!-- 播放列表 -->
+    <playlist ref="playlist" />
+
     <!-- 实际播放器 -->
     <audio
       ref="audio"
       :src="currentSong.url"
-      @canplay="ready"
+      @playing="ready"
       @error="error"
       @timeupdate="updateTime"
       @ended="end"
@@ -140,8 +143,10 @@ import ProgressBar from 'base/progress-bar/progress-bar';
 import ProgressCircle from 'base/progress-circle/progress-circle';
 import Scroll from 'base/scroll/scroll';
 import { playMode } from 'common/js/config';
-import { shuffle } from 'common/js/util';
+// import { shuffle } from 'common/js/util';
 import Lyric from 'lyric-parser';
+import Playlist from 'components/playlist/playlist';
+import { playerMixin } from 'common/js/mixin';
 
 const transform = prefixStyle('transform');
 const transitionDuration = prefixStyle('transitionDuration');
@@ -151,7 +156,9 @@ export default {
     ProgressBar,
     ProgressCircle,
     Scroll,
+    Playlist,
   },
+  mixins: [playerMixin],
   data() {
     return {
       songReady: false,
@@ -166,12 +173,12 @@ export default {
   computed: {
     ...mapGetters([
       'fullScreen',
-      'playlist',
-      'currentSong',
+      // 'playlist',
+      // 'currentSong',
       'playing',
       'currentIndex',
-      'mode',
-      'sequenceList',
+      // 'mode',
+      // 'sequenceList',
     ]),
     playIcon() {
       return this.playing ? 'icon-pause' : 'icon-play';
@@ -190,16 +197,14 @@ export default {
       return this.currentTime / this.currentSong.duration;
     },
     //
-    iconMode() {
-      return this.mode === playMode.sequence
-        ? 'icon-sequence'
-        : this.mode === playMode.loop
-          ? 'icon-loop' : 'icon-random';
-    }
   },
   watch: {
     currentSong(newSong, oldSong) {
-      // 需要在dom ready之后才能play.
+      // 删除了, 没有歌
+      if (!newSong.id) {
+        return;
+      }
+      // 歌没变化
       if (newSong.id === oldSong.id) {
         return;
       }
@@ -211,6 +216,7 @@ export default {
       //   this.$refs.audio.play();
       //   this.getLyric();
       // });
+      // 需要在dom ready之后才能play.
       // setTimeout更慢, 保证手机后台切换时songReady正常,歌曲能成功播放
       setTimeout(() => {
         this.$refs.audio.play();
@@ -230,10 +236,6 @@ export default {
   methods: {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
-      setPlayingState: 'SET_PLAYING_STATE',
-      setCurrentIndex: 'SET_CURRENT_INDEX',
-      setPlayMode: 'SET_PLAY_MODE',
-      setPlayList: 'SET_PLAYLIST',
     }),
     // 播放器
     togglePlaying() {
@@ -246,6 +248,7 @@ export default {
       }
     },
     ready() {
+      clearTimeout(this.timer);
       this.songReady = true;
     },
     end() {
@@ -389,28 +392,16 @@ export default {
         this.currentLyric.seek(currentTime * 1000);
       }
     },
-    changeMode() {
-      const mode = (this.mode + 1) % 3;
-      this.setPlayMode(mode);
-      let list = null;
-      if (mode === playMode.random) {
-        list = shuffle(this.sequenceList);
-      } else {
-        list = this.sequenceList;
-      }
-      this.resetCurrentIndex(list);
-      this.setPlayList(list);
-    },
-    resetCurrentIndex(list) {
-      const index = list.findIndex(item => item.id === this.currentSong.id);
-      this.setCurrentIndex(index);
-    },
     loop() {
       this.$refs.audio.currentTime = 0;
       this.$refs.audio.play();
       if (this.currentLyric) {
         this.currentLyric.seek(0);
       }
+    },
+    // 播放列表
+    showPlaylist() {
+      this.$refs.playlist.show();
     },
     // UI
     back() {

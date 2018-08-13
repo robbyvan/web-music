@@ -26,7 +26,7 @@ export default {
   props: {
     text: { type: String, default: '确认要这样吗?' },
     cancelBtnText: { type: String, default: '取消' },
-    confirmBtnText: { type: String, default: '确认' },
+    confirmBtnText: { type: String, default: '是的' },
   },
   methods: {
     show() {

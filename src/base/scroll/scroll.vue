@@ -76,7 +76,6 @@ export default {
   },
   watch: {
     data() {
-      console.log('ha');
       setTimeout(() => {
         this.refresh();
       }, 20);
