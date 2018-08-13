@@ -33,7 +33,7 @@
         </scroll>
         <!-- 操作列表 -->
         <div class="list-operate">
-          <div class="add">
+          <div class="add" @click="openAddSong">
             <i class="icon-add"></i>
             <span class="text">添加歌曲到队列</span>
           </div>
@@ -43,11 +43,14 @@
           <span>关闭</span>
         </div>
       </div>
+      <!-- 弹窗确认 -->
       <confirm
         ref="confirm"
         text="要清空播放列表吗?"
         @confirm="confirmClear"
       />
+      <!-- 添加歌曲到列表 -->
+      <add-song ref="addSong" />
     </div>
   </transition>
 </template>
@@ -56,6 +59,7 @@
 import { mapActions } from 'vuex';
 import Scroll from 'base/scroll/scroll';
 import Confirm from 'base/confirm/confirm';
+import AddSong from 'components/add-song/add-song';
 import { playMode } from 'common/js/config';
 import { playerMixin } from 'common/js/mixin';
 
@@ -63,6 +67,7 @@ export default {
   components: {
     Scroll,
     Confirm,
+    AddSong,
   },
   mixins: [playerMixin],
   data() {
@@ -112,6 +117,10 @@ export default {
     confirmClear() {
       this.deleteSongList();
       this.hide();
+    },
+    // 打开添加歌曲界面
+    openAddSong() {
+      this.$refs.addSong.show();
     },
     getCurrentIcon(item) {
       return this.currentSong.id === item.id ? 'icon-play' : '';
