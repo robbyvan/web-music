@@ -144,6 +144,9 @@ export default {
       }
       this.$emit('select');
     },
+    refresh() {
+      this.$refs.suggest.refresh();
+    },
     // 开始滚动
     listScroll() {
       this.$emit('listScroll');
