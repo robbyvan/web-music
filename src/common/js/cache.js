@@ -27,3 +27,22 @@ export function saveSearch(q) {
 export function loadSearch() {
   return storage.get(SEARCH_KEY, []);
 }
+
+function deleteFromArray(arr, compare) {
+  const index = arr.findIndex(compare);
+  if (index > -1) {
+    arr.splice(index, 1);
+  }
+}
+
+export function deleteSearch(q) {
+  let searches = storage.get(SEARCH_KEY, []);
+  deleteFromArray(searches, item => item === q);
+  storage.set(SEARCH_KEY, searches);
+  return searches;
+}
+
+export function clearSearch() {
+  storage.remove(SEARCH_KEY);
+  return [];
+}

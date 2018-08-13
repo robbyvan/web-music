@@ -15,20 +15,43 @@
             </li>
           </ul>
         </div>
+        <!-- 搜索历史 -->
+        <div class="search-history" v-show="searchHistory.length">
+          <h1 class="title">
+            <span class="text">搜索历史</span>
+            <span class="clear" @click="showConfirm">
+              <i class="icon-clear"></i>
+            </span>
+          </h1>
+          <search-list
+            :searches="searchHistory"
+            @click="addQuery"
+            @delete="deleteSearchHistory"
+          />
+        </div>
       </div>
     </div>
     <!-- 搜索结果 -->
     <div class="search-result" v-show="query">
-      <suggest :query="query" @listScroll="blurInput"></suggest>
+      <suggest :query="query" @listScroll="blurInput" @select="saveSearch"></suggest>
     </div>
+    <!-- 确认弹窗 -->
+    <confirm
+      ref="confirm"
+      text="要清空搜索历史吗?"
+      @confirm="clearSearchHistory"
+    />
     <!-- search结果点击跳转 -->
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
 import SearchBox from 'base/search-box/search-box';
 import Suggest from 'components/suggest/suggest';
+import SearchList from 'base/search-list/search-list';
+import Confirm from 'base/confirm/confirm';
 import { getHotKey } from 'api/search';
 import { ERR_OK } from 'api/config';
 
@@ -36,6 +59,8 @@ export default {
   components: {
     SearchBox,
     Suggest,
+    SearchList,
+    Confirm
   },
   data() {
     return {
@@ -43,10 +68,20 @@ export default {
       query: ''
     };
   },
+  computed: {
+    ...mapGetters([
+      'searchHistory'
+    ]),
+  },
   created() {
     this._getHotKey();
   },
   methods: {
+    ...mapActions([
+      'saveSearchHistory',
+      'deleteSearchHistory',
+      'clearSearchHistory',
+    ]),
     addQuery(q) {
       this.$refs.searchBox.setQuery(q);
     },
@@ -55,6 +90,12 @@ export default {
     },
     blurInput() {
       this.$refs.searchBox.blur();
+    },
+    saveSearch() {
+      this.saveSearchHistory(this.query);
+    },
+    showConfirm() {
+      this.$refs.confirm.show();
     },
     _getHotKey() {
       getHotKey().then((res) => {
