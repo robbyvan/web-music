@@ -10,6 +10,7 @@ const state = {
   currentIndex: -1, // 当前歌曲的索引
   disc: {},
   topList: {},
+  searchHistory: [],
 };
 
 export default state;

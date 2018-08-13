@@ -13,6 +13,8 @@ export default {
     click: { type: Boolean, default: true },
     data: { type: Array, default: null },
     listenScroll: { type: Boolean, default: false },
+    pullup: { type: Boolean, default: false },
+    beforeScroll: { type: Boolean, default: false },
   },
   mounted() {
     setTimeout(() => {
@@ -35,6 +37,24 @@ export default {
         // 时间this默认指向了scroll, 需要vue实例$emit.
         this.scroll.on('scroll', pos => {
           self.$emit('scroll', pos);
+        });
+      }
+
+      // 开启上拉刷新
+      if (this.pullup) {
+        this.scroll.on('scrollEnd', () => {
+          if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+            this.$emit('scrollToEnd');
+          }
+        });
+      }
+
+      // 开始滚动 => 收起键盘
+      if (this.beforeScroll) {
+        this.scroll.on('beforeScrollStart', () => {
+          if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+            this.$emit('beforeScrollStart');
+          }
         });
       }
     },

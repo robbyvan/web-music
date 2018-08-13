@@ -1,9 +1,11 @@
 <template>
   <div class="search">
+    <!-- 搜索框 -->
     <div class="search-box-wrapper">
-      <search-box ref="searchBox"></search-box>
+      <search-box ref="searchBox" @query="updateQuery"></search-box>
     </div>
-    <div class="shortcut-wrapper">
+    <!-- 热搜 -->
+    <div class="shortcut-wrapper" v-show="!query">
       <div class="shortcut">
         <div class="hot-key">
           <h1 class="title">热门搜索</h1>
@@ -15,21 +17,30 @@
         </div>
       </div>
     </div>
+    <!-- 搜索结果 -->
+    <div class="search-result" v-show="query">
+      <suggest :query="query" @listScroll="blurInput"></suggest>
+    </div>
+    <!-- search结果点击跳转 -->
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 import SearchBox from 'base/search-box/search-box';
+import Suggest from 'components/suggest/suggest';
 import { getHotKey } from 'api/search';
 import { ERR_OK } from 'api/config';
 
 export default {
   components: {
     SearchBox,
+    Suggest,
   },
   data() {
     return {
       hotKey: [],
+      query: ''
     };
   },
   created() {
@@ -38,6 +49,12 @@ export default {
   methods: {
     addQuery(q) {
       this.$refs.searchBox.setQuery(q);
+    },
+    updateQuery(q) {
+      this.query = q;
+    },
+    blurInput() {
+      this.$refs.searchBox.blur();
     },
     _getHotKey() {
       getHotKey().then((res) => {
