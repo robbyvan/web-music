@@ -33,7 +33,7 @@ export const playerMixin = {
       'playlist',
       'currentSong',
       'mode',
-      'favoriteList'
+      'favoriteList',
     ]),
     iconMode() {
       return this.mode === playMode.sequence
