@@ -10,15 +10,43 @@
       </div>
       <!-- 搜索框 -->
       <div class="search-box-wrapper">
-        <search-box placeholder="搜索歌曲" @query="updateQuery" />
+        <search-box ref="searchBox" placeholder="搜索歌曲" @query="updateQuery" />
       </div>
-      <!--  -->
+      <!-- 切换标签: 最近播放 / 搜索历史 -->
       <div class="shortcut" v-show="!query">
         <switches
           :switches="switches"
           :currentIndex="currentIndex"
           @switch="switchItem"
         />
+        <div class="list-wrapper">
+          <!-- 最近播放 -->
+          <scroll
+            ref="songList"
+            class="list-scroll"
+            v-if="currentIndex === 0"
+            :data="playHistory"
+          >
+            <div class="list-inner">
+              <song-list :songs="playHistory" @select="selectSong" />
+            </div>
+          </scroll>
+          <!-- 搜索历史 -->
+          <scroll
+            ref="searchList"
+            class="list-scroll"
+            v-if="currentIndex === 1"
+            :data="searchHistory"
+          >
+            <div class="list-inner">
+              <search-list
+                @delete="deleteSearchHistory"
+                @select="addQuery"
+                :searches="searchHistory"
+              />
+            </div>
+          </scroll>
+        </div>
       </div>
       <!-- 搜索结果 -->
       <div class="search-result" v-show="query">
@@ -34,18 +62,24 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
 import SearchBox from 'base/search-box/search-box';
 import Suggest from 'components/suggest/suggest';
 import { searchMixin } from 'common/js/mixin';
 import Switches from 'base/switches/switches';
-// import Confirm from 'base/confirm/confirm';
-// import Scroll from 'base/scroll/scroll';
+import Scroll from 'base/scroll/scroll';
+import SongList from 'base/song-list/song-list';
+import Song from 'common/js/song';
+import SearchList from 'base/search-list/search-list';
 
 export default {
   components: {
     SearchBox,
     Suggest,
-    Switches
+    Switches,
+    Scroll,
+    SongList,
+    SearchList
   },
   mixins: [searchMixin],
   data() {
@@ -59,9 +93,20 @@ export default {
       ]
     };
   },
+  computed: {
+    ...mapGetters(['playHistory'])
+  },
   methods: {
+    ...mapActions(['insertSong']),
     show() {
       this.showFlag = true;
+      setTimeout(() => {
+        if (this.currentIndex === 0) {
+          this.$refs.songList.refresh();
+        } else {
+          this.$refs.searchList.refresh();
+        }
+      }, 20);
     },
     hide() {
       this.showFlag = false;
@@ -69,8 +114,15 @@ export default {
     selectSuggest() {
       this.saveSearch();
     },
+    // 切换标签
     switchItem(index) {
       this.currentIndex = index;
+    },
+    // 选择歌曲
+    selectSong(song, index) {
+      if (index !== 0) {
+        this.insertSong(new Song(song));
+      }
     }
   },
 };

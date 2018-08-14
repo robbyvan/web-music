@@ -136,7 +136,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
 import animations from 'create-keyframe-animation';
 import { prefixStyle } from 'common/js/dom';
 import ProgressBar from 'base/progress-bar/progress-bar';
@@ -237,6 +237,7 @@ export default {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
     }),
+    ...mapActions(['savePlayHistory']),
     // 播放器
     togglePlaying() {
       if (!this.songReady) {
@@ -250,6 +251,7 @@ export default {
     ready() {
       clearTimeout(this.timer);
       this.songReady = true;
+      this.savePlayHistory(this.currentSong);
     },
     end() {
       if (this.mode === playMode.loop) {

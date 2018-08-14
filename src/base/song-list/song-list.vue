@@ -91,7 +91,7 @@ export default {
     }
     .content {
       flex: 1;
-      line-height: 20px;
+      line-height: 25px;
       overflow: hidden;
       .name {
         @include no-wrap();
