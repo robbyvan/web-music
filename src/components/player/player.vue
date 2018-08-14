@@ -131,7 +131,7 @@
     <audio
       ref="audio"
       :src="currentSong.url"
-      @playing="ready"
+      @play="ready"
       @error="error"
       @timeupdate="updateTime"
       @ended="end"
@@ -216,15 +216,13 @@ export default {
         // 切歌时清除上一首歌的歌词计时器
         this.currentLyric.stop();
       }
-      // this.$nextTick(() => {
-      //   this.$refs.audio.play();
-      //   this.getLyric();
-      // });
       // 需要在dom ready之后才能play.
-      // setTimeout更慢, 保证手机后台切换时songReady正常,歌曲能成功播放
-      setTimeout(() => {
-        this.$refs.audio.play();
-        this.getLyric();
+      // setTimeout? 保证手机后台切换回来时js能正常执行, 使songReady正常,歌曲能成功播放
+      clearTimeout(this.timer); // 加一个timer 保证只执行一次下面的代码
+      this.timer = setTimeout(() => {
+        // 要处理下面两个函数的关联问题: 在getLyric()中添加判断.
+        this.$refs.audio.play(); // 立刻播放
+        this.getLyric(); // 是异步, 要先去获取歌词
       }, 1000);
     },
     playing(shouldPlay) {
@@ -253,6 +251,7 @@ export default {
       }
     },
     ready() {
+      // 顺序: 先settimeout里触发play(只一次) => 再ready设置songReady
       clearTimeout(this.timer);
       this.songReady = true;
       this.savePlayHistory(this.currentSong);
@@ -274,6 +273,7 @@ export default {
       // 边界情况: 只有一首歌, 调用next = loop
       if (this.playlist.length === 1) {
         this.loop();
+        return;
       } else {
         let index = this.currentIndex + 1;
         if (index === this.playlist.length) {
@@ -293,6 +293,7 @@ export default {
       // 边界情况: 只有一首歌, 调用next = loop
       if (this.playlist.length === 1) {
         this.loop();
+        return;
       } else {
         let index = this.currentIndex - 1;
         if (index === -1) {
@@ -305,12 +306,24 @@ export default {
       }
       this.songReady = false;
     },
+    loop() {
+      this.$refs.audio.currentTime = 0;
+      this.$refs.audio.play();
+      this.setPlayingState(true);
+      if (this.currentLyric) {
+        this.currentLyric.seek(0);
+      }
+    },
     updateTime(e) {
       this.currentTime = e.target.currentTime;
     },
     getLyric() {
       this.currentSong.getLyric()
         .then(lyric => {
+          if (this.currentSong.lyric !== lyric) {
+            // 如果切歌了, 直接返回
+            return;
+          }
           this.currentLyric = new Lyric(lyric, this.handleLyric);
           if (this.playing) {
             this.currentLyric.play();
@@ -396,13 +409,6 @@ export default {
       }
       if (this.currentLyric) {
         this.currentLyric.seek(currentTime * 1000);
-      }
-    },
-    loop() {
-      this.$refs.audio.currentTime = 0;
-      this.$refs.audio.play();
-      if (this.currentLyric) {
-        this.currentLyric.seek(0);
       }
     },
     // 播放列表
