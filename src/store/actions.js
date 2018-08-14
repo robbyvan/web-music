@@ -1,7 +1,14 @@
 import * as types from './mutation-types';
 import { playMode } from 'common/js/config';
 import { shuffle } from 'common/js/util';
-import { saveSearch, deleteSearch, clearSearch, savePlay } from 'common/js/cache';
+import {
+  saveSearch,
+  deleteSearch,
+  clearSearch,
+  savePlay,
+  saveFavorite,
+  deleteFavorite,
+} from 'common/js/cache';
 
 function findIndex(list, song) {
   return list.findIndex(item => item.id === song.id);
@@ -113,4 +120,14 @@ export function clearSearchHistory({ commit }) {
 // 添加到播放记录
 export function savePlayHistory({ commit }, song) {
   commit(types.SET_PLAY_HISTORY, savePlay(song));
+}
+
+// 收藏喜欢
+export function saveFavoriteList({ commit }, song) {
+  commit(types.SET_FAVORITE_LIST, saveFavorite(song));
+}
+
+// 删除喜欢
+export function deleteFavoriteList({ commit }, song) {
+  commit(types.SET_FAVORITE_LIST, deleteFavorite(song));
 }
