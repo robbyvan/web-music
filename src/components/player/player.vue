@@ -177,12 +177,8 @@ export default {
   computed: {
     ...mapGetters([
       'fullScreen',
-      // 'playlist',
-      // 'currentSong',
       'playing',
       'currentIndex',
-      // 'mode',
-      // 'sequenceList',
     ]),
     playIcon() {
       return this.playing ? 'icon-pause' : 'icon-play';
@@ -204,12 +200,8 @@ export default {
   },
   watch: {
     currentSong(newSong, oldSong) {
-      // 删除了, 没有歌
-      if (!newSong.id) {
-        return;
-      }
-      // 歌没变化
-      if (newSong.id === oldSong.id) {
+      // 删除了, 没有歌 || 歌没变化
+      if (!newSong.id || !newSong.url || newSong.id === oldSong.id) {
         return;
       }
       if (this.currentLyric) {
@@ -252,7 +244,7 @@ export default {
     },
     ready() {
       // 顺序: 先settimeout里触发play(只一次) => 再ready设置songReady
-      clearTimeout(this.timer);
+      // clearTimeout(this.timer);
       this.songReady = true;
       this.savePlayHistory(this.currentSong);
     },
@@ -318,6 +310,7 @@ export default {
       this.currentTime = e.target.currentTime;
     },
     getLyric() {
+      console.log('heelo?');
       this.currentSong.getLyric()
         .then(lyric => {
           if (this.currentSong.lyric !== lyric) {
