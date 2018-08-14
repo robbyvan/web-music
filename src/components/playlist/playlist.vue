@@ -11,7 +11,12 @@
           </h1>
         </div>
         <!-- 列表内容 -->
-        <scroll class="list-content" :data="sequenceList" ref="listContent">
+        <scroll
+          class="list-content"
+          ref="listContent"
+          :data="sequenceList"
+          :refreshDelay="refreshDelay"
+        >
           <transition-group name="list" tag="ul">
             <li
               ref="listItem"
@@ -73,6 +78,7 @@ export default {
   data() {
     return {
       showFlag: false,
+      refreshDelay: 100,
     };
   },
   computed: {

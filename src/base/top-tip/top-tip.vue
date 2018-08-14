@@ -19,7 +19,7 @@ export default {
   methods: {
     show() {
       this.showFlag = true;
-      clearTimeout(this.timer)
+      clearTimeout(this.timer);
       this.timer = setTimeout(() => {
         this.hide();
       }, this.delay);

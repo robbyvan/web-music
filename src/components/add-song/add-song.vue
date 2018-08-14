@@ -37,6 +37,7 @@
             class="list-scroll"
             v-if="currentIndex === 1"
             :data="searchHistory"
+            :refreshDelay="refreshDelay"
           >
             <div class="list-inner">
               <search-list
