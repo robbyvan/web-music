@@ -15,7 +15,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      component: () => import(/* webpackChunkName: "recommend" */ 'components/recommend/recommend')
+      redirect: '/recommend'
     },
     {
       path: '/recommend',

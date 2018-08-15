@@ -44,10 +44,10 @@ export default {
       getSongList(this.disc.dissid)
         .then(res => {
           if (res.code === ERR_OK) {
-            console.log(res);
+            // console.log(res);
             processSongsUrl(this._normalizeSongs(res.cdlist[0].songlist)).then((songs) => {
               this.songs = songs;
-              console.log(this.songs);
+              // console.log(this.songs);
             });
           }
         });

@@ -69,7 +69,7 @@ export default {
   }
   .icon-dismiss {
     font-size: 16px;
-    color: $color-background;
+    color: $color-theme;
   }
 }
 </style>

@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('../fonts/icomoon.eot?2qevqt');
-  src:  url('../fonts/icomoon.eot?2qevqt#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon.ttf?2qevqt') format('truetype'),
-    url('../fonts/icomoon.woff?2qevqt') format('woff'),
-    url('../fonts/icomoon.svg?2qevqt#icomoon') format('svg');
+  src:  url('../fonts/icomoon.eot?wd14lt');
+  src:  url('../fonts/icomoon.eot?wd14lt#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon.ttf?wd14lt') format('truetype'),
+    url('../fonts/icomoon.woff?wd14lt') format('woff'),
+    url('../fonts/icomoon.svg?wd14lt#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -25,89 +25,74 @@
 }
 
 .icon-ok:before {
-  content: "\e900"
+  content: "\e900";
 }
-
-.icon-close:before {
-  content: "\e901"
+.icon-no:before {
+  content: "\e901";
 }
-
 .icon-add:before {
-  content: "\e902"
+  content: "\e902";
 }
-
 .icon-play-mini:before {
-  content: "\e903"
+  content: "\e903";
 }
-
 .icon-playlist:before {
-  content: "\e904"
+  content: "\e904";
 }
-
 .icon-music:before {
-  content: "\e905"
+  content: "\e905";
 }
-
-.icon-search:before {
-  content: "\e906"
+.icon-Search:before {
+  content: "\e906";
 }
-
 .icon-clear:before {
-  content: "\e907"
+  content: "\e907";
 }
-
-.icon-delete:before {
-  content: "\e908"
+.icon-close:before {
+  content: "\e908";
 }
-
-.icon-favorite:before {
-  content: "\e909"
+.icon-like2:before {
+  content: "\e909";
 }
-
-.icon-not-favorite:before {
-  content: "\e90a"
+.icon-not-like2:before {
+  content: "\e90a";
 }
-
 .icon-pause:before {
-  content: "\e90b"
+  content: "\e90b";
 }
-
 .icon-play:before {
-  content: "\e90c"
+  content: "\e90c";
 }
-
 .icon-prev:before {
-  content: "\e90d"
+  content: "\e90d";
 }
-
 .icon-loop:before {
-  content: "\e90e"
+  content: "\e90e";
 }
-
 .icon-sequence:before {
-  content: "\e90f"
+  content: "\e90f";
 }
-
 .icon-random:before {
-  content: "\e910"
+  content: "\e910";
 }
-
 .icon-back:before {
-  content: "\e911"
+  content: "\e911";
 }
-
 .icon-mine:before {
-  content: "\e912"
+  content: "\e912";
 }
-
 .icon-next:before {
-  content: "\e913"
+  content: "\e913";
 }
-
 .icon-dismiss:before {
-  content: "\e914"
+  content: "\e914";
 }
-
 .icon-pause-mini:before {
-  content: "\e915"
+  content: "\e915";
+}
+.icon-not-favorite:before {
+  content: "\e9d7";
+}
+.icon-favorite:before {
+  content: "\e9d9";
 }

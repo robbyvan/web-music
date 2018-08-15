@@ -99,7 +99,7 @@ export default {
       }
       this.page++;
       this.isLoading = true;
-      console.log(this.page, 'page');
+      // console.log(this.page, 'page');
       search(this.query, this.page, this.showSinger, RESULT_PER_PAGE)
         .then(res => {
           this.isLoading = false;

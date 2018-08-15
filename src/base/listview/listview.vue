@@ -132,7 +132,7 @@ export default {
       this.$emit('select', item);
     },
     onShortcutTouchStart(e) {
-      console.log(e);
+      // console.log(e);
       const anchorIndex = getData(e.target, 'index');
       // 记录开始滑动时的位置
       const firstTouch = e.touches[0];

@@ -143,7 +143,7 @@ export default {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: $color-text-l;
+      background: $color-highlight-background;
       &.active {
         border-radius: 2px;
         transform: rotate(45deg);

@@ -30,8 +30,8 @@
               <span class="like" @click.stop="toggleFavorite(item)">
                 <i :class="getFavoriteIcon(item)"></i>
               </span>
-              <span @click.stop="deleteOne(item)">
-                <i class="icon-delete"></i>
+              <span class="delete" @click.stop="deleteOne(item)">
+                <i class="icon-close"></i>
               </span>
             </li>
           </transition-group>

@@ -35,7 +35,7 @@ export default {
   align-items: center;
   width: 240px;
   margin: 0 auto;
-  border: 1px solid $color-highlight-background;
+  border: 1px solid $color-theme-d;
   border-radius: 5px;
   .switch-item {
     flex: 1;
@@ -44,7 +44,7 @@ export default {
     font-size: $font-size-medium;
     color: $color-text-d;
     &.active {
-      background: $color-highlight-background;
+      background: $color-theme-d;
       color: $color-text;
     }
   }

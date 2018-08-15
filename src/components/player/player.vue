@@ -52,6 +52,10 @@
                    class="text"
                    :key="line.time">{{ line.txt }}</p>
               </div>
+              <!-- 纯音乐 无歌词 -->
+              <div class="pure-music" v-show="isPureMusic">
+                <p>{{ pureMusicLyric }}</p>
+              </div>
             </div>
           </scroll>
         </div>
@@ -130,11 +134,11 @@
     <!-- 实际播放器 -->
     <audio
       ref="audio"
-      :src="currentSong.url"
-      @play="ready"
+      @playing="ready"
       @error="error"
       @timeupdate="updateTime"
       @ended="end"
+      @pause="paused"
     ></audio>
   </div>
 </template>
@@ -155,6 +159,8 @@ import { playerMixin } from 'common/js/mixin';
 const transform = prefixStyle('transform');
 const transitionDuration = prefixStyle('transitionDuration');
 
+const timeExp = /\[(\d{2}):(\d{2}):(\d{2})]/g;
+
 export default {
   components: {
     ProgressBar,
@@ -172,6 +178,8 @@ export default {
       currentLineNum: 0,
       currentShow: 'cd',
       playingLyric: '',
+      isPureMusic: false,
+      pureMusicLyric: ''
     };
   },
   computed: {
@@ -204,24 +212,61 @@ export default {
       if (!newSong.id || !newSong.url || newSong.id === oldSong.id) {
         return;
       }
+      // console.log('changed!', newSong, oldSong);
+      // 歌曲发生变化, 重置初始状态
+      this.songReady = false;
+      this.canLyricPlay = false;
+      // 切歌时清除上一首歌的歌词计时器
       if (this.currentLyric) {
-        // 切歌时清除上一首歌的歌词计时器
         this.currentLyric.stop();
+        // 重置歌词相关
+        this.currentLyric = null;
+        this.currentTime = 0;
+        this.playingLyric = 0;
+        this.currentLineNum = 0;
       }
-      // 需要在dom ready之后才能play.
-      // setTimeout? 保证手机后台切换回来时js能正常执行, 使songReady正常,歌曲能成功播放
-      clearTimeout(this.timer); // 加一个timer 保证只执行一次下面的代码
+      // console.log('写src之前:');
+      console.log(this.$refs.audio.src);
+      // 动态写audio的src并播放
+      this.$refs.audio.src = newSong.url;
+      // console.log('写src之后:');
+      console.log(this.$refs.audio.src);
+      this.$refs.audio.play();
+      // console.log('播放');
+
+      // 如果5s没有加载到歌曲, 认为超时(若没超时, 在ready里会清除掉这个timer), 修正songReady保证可以切歌.
+      clearTimeout(this.timer);
       this.timer = setTimeout(() => {
-        // 要处理下面两个函数的关联问题: 在getLyric()中添加判断.
-        this.$refs.audio.play(); // 立刻播放
-        this.getLyric(); // 是异步, 要先去获取歌词
-      }, 1000);
+        this.songReady = true;
+      }, 5000);
+      // 异步获取歌词
+      this.getLyric();
+
+      // // 需要在dom ready之后才能play.
+      // // setTimeout? 保证手机后台切换回来时js能正常执行, 使songReady正常,歌曲能成功播放
+      // clearTimeout(this.timer); // 加一个timer 保证只执行一次下面的代码
+      // this.timer = setTimeout(() => {
+      //   // 要处理下面两个函数的关联问题: 在getLyric()中添加判断.
+      //   this.$refs.audio.play(); // 立刻播放
+      //   this.getLyric(); // 是异步, 要先去获取歌词
+      // }, 1000);
     },
     playing(shouldPlay) {
+      if (!this.songReady) {
+        return;
+      }
       const audio = this.$refs.audio;
       this.$nextTick(() => {
         shouldPlay ? audio.play() : audio.pause();
       });
+      // 暂停时封面旋转动画停止
+      if (!shouldPlay) {
+        if (this.fullScreen) {
+          this.syncWrapperTransform('imageWrapper', 'image');
+        } else {
+          this.syncWrapperTransform('miniWrapper', 'miniImage');
+        }
+      }
     }
   },
   created() {
@@ -243,10 +288,24 @@ export default {
       }
     },
     ready() {
-      // 顺序: 先settimeout里触发play(只一次) => 再ready设置songReady
-      // clearTimeout(this.timer);
+      // 加载完毕了, 清空掉设置的timer
+      // console.log('i\'m playing!');
+      clearTimeout(this.timer);
+      // 准备完成
       this.songReady = true;
+      this.canLyricPlay = true;
+
       this.savePlayHistory(this.currentSong);
+      // 如果歌曲播放更晚, 同步歌词
+      if (this.currentLyric && !this.isPureMusic) {
+        this.currentLyric.seek(this.currentTime * 1000);
+      }
+    },
+    paused() {
+      this.setPlayingState(false);
+      if (this.currentLyric) {
+        this.currentLyric.stop();
+      }
     },
     end() {
       if (this.mode === playMode.loop) {
@@ -310,7 +369,6 @@ export default {
       this.currentTime = e.target.currentTime;
     },
     getLyric() {
-      console.log('heelo?');
       this.currentSong.getLyric()
         .then(lyric => {
           if (this.currentSong.lyric !== lyric) {
@@ -318,10 +376,18 @@ export default {
             return;
           }
           this.currentLyric = new Lyric(lyric, this.handleLyric);
-          if (this.playing) {
-            this.currentLyric.play();
+          // 纯音乐 无歌词
+          this.isPureMusic = !this.currentLyric.lines.length;
+          if (this.isPureMusic) {
+            this.pureMusicLyric = this.currentLyric.lrc.replace(timeExp, '').trim();
+            this.playingLyric = this.pureMusicLyric;
+          } else {
+            // 有歌词
+            if (this.playing && this.canLyricPlay) {
+              // 同步歌词到歌曲时间
+              this.currentLyric.seek(this.currentTime * 1000);
+            }
           }
-          // console.log(this.currentLyric);
         })
         .catch(() => {
           // 异常处理
@@ -443,6 +509,17 @@ export default {
     afterLeave() {
       this.$refs.cdWrapper.style.transition = '';
       this.$refs.cdWrapper.style[transform] = '';
+    },
+    // 暂停时封面旋转动画停止
+    syncWrapperTransform(wrapper, inner) {
+      if (!this.$refs[wrapper]) {
+        return;
+      }
+      let imageWrapper = this.$refs[wrapper];
+      let image = this.$refs[inner];
+      let wTransform = getComputedStyle(imageWrapper)[transform];
+      let iTransform = getComputedStyle(image)[transform];
+      imageWrapper.style[transform] = wTransform === 'none' ? iTransform : iTransform.concat(' ', wTransform);
     },
     _getPosAndScale() {
       const targetWidth = 40; // 小图标宽度40
