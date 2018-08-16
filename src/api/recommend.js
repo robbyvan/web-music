@@ -2,6 +2,8 @@ import axios from 'axios';
 import jsonp from 'common/js/jsonp';
 import { commonParams, options } from './config.js';
 
+const debug = process.env.NODE_ENV !== 'production';
+
 // 获得推荐slider内容
 export function getRecommend() {
   const url = 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg';
@@ -15,7 +17,7 @@ export function getRecommend() {
 
 // 获得歌单列表
 export function getList() {
-  const url = '/api/getRecommendList';
+  const url = debug ? '/api/getRecommendList' : 'http://robbyvan.us/api/getRecommendList';
   const data = Object.assign({}, commonParams, {
     rnd: Math.random(),
     hostUin: 0,
@@ -37,7 +39,7 @@ export function getList() {
 
 // 获得歌单的歌曲列表
 export function getSongList(disstid) {
-  const url = '/api/getCdInfo';
+  const url = debug ? '/api/getCdInfo' : 'http://robbyvan.us/api/getCdInfo';
 
   const data = Object.assign({}, commonParams, {
     disstid,
