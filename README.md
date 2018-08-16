@@ -57,7 +57,7 @@
 ### 用户中心
 + 利用本地存储```localstorage```记录用户喜欢的歌曲, 最近播放
 
-##Build Setup
+## Build Setup
 ```
   yarn        # install dependencies
   yarn dev    # dev server running at localhost:8080
