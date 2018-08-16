@@ -1,5 +1,6 @@
 <template>
   <div class="recommend" ref="recommend">
+    <!-- 轮播图 -->
     <scroll ref="scroll" class="recommend-content" :data="discList">
       <div>
         <div v-if="recommends.length" class="slider-wrapper">
@@ -11,6 +12,7 @@
             </div>
           </slider>
         </div>
+        <!-- 歌单推荐 -->
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
           <ul>
@@ -26,7 +28,7 @@
           </ul>
         </div>
       </div>
-
+      <!-- 加载图 -->
       <div class="loading-container" v-show="!discList.length">
         <loading />
       </div>

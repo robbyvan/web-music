@@ -226,11 +226,11 @@ export default {
         this.currentLineNum = 0;
       }
       // console.log('写src之前:');
-      console.log(this.$refs.audio.src);
+      // console.log(this.$refs.audio.src);
       // 动态写audio的src并播放
       this.$refs.audio.src = newSong.url;
       // console.log('写src之后:');
-      console.log(this.$refs.audio.src);
+      // console.log(this.$refs.audio.src);
       this.$refs.audio.play();
       // console.log('播放');
 
