@@ -17,7 +17,7 @@ export function getRecommend() {
 
 // 获得歌单列表
 export function getList() {
-  const url = debug ? '/api/getRecommendList' : 'http://robbyvan.us/api/getRecommendList';
+  const url = debug ? '/api/getRecommendList' : 'http://robbyvan.us/music/api/getRecommendList';
   const data = Object.assign({}, commonParams, {
     rnd: Math.random(),
     hostUin: 0,
@@ -39,7 +39,7 @@ export function getList() {
 
 // 获得歌单的歌曲列表
 export function getSongList(disstid) {
-  const url = debug ? '/api/getCdInfo' : 'http://robbyvan.us/api/getCdInfo';
+  const url = debug ? '/api/getCdInfo' : 'http://robbyvan.us/music/api/getCdInfo';
 
   const data = Object.assign({}, commonParams, {
     disstid,
