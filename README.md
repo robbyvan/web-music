@@ -3,7 +3,7 @@
 
 ## Demo
 🎵[在线预览: 移动端web-music](http://robbyvan.us/music/)<br />
-扫描二维码获得更好的体验📱~
+使用手机浏览器打开获得更佳体验~📱
 ![](./qrcode/cli_300px.png)
 
 ### 推荐
