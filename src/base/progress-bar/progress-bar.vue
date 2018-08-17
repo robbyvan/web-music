@@ -7,7 +7,7 @@
     <div class="bar-inner">
       <!-- 已播放的进度 -->
       <div ref="progress" class="progress"></div>
-       <!-- 小球 -->
+      <!-- 小球 -->
       <div
         ref="progressBtn"
         class="progress-btn-wrapper"

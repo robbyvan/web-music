@@ -109,7 +109,7 @@ export default {
         color: $color-text-d;
         font-size: $font-size-small;
         .song {
-          @include no-wrap();
+          @include no-wrap(); // 单行文本省略号
           line-height: 26px;
           .singername {
             color: rgba(255, 255, 255, 0.2);

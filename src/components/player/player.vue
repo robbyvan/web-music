@@ -32,8 +32,8 @@
           <!-- 专辑封面 -->
           <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd" :class="cdCls">
-                <img :src="currentSong.img" class="image" />
+              <div class="cd" :class="cdCls" ref="imageWrapper">
+                <img :src="currentSong.img" class="image" ref="image" />
               </div>
             </div>
             <!-- 当前歌词 -->
@@ -109,7 +109,9 @@
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
-          <img :src="currentSong.img" width="40" height="40" :class="cdCls"/>
+          <div class="imageWrapper" ref="miniWrapper">
+            <img ref="miniImage" :src="currentSong.img" width="40" height="40" :class="cdCls"/>
+          </div>
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
@@ -515,11 +517,14 @@ export default {
       if (!this.$refs[wrapper]) {
         return;
       }
-      let imageWrapper = this.$refs[wrapper];
+      // let imageWrapper = this.$refs[wrapper];
       let image = this.$refs[inner];
-      let wTransform = getComputedStyle(imageWrapper)[transform];
+      // let wTransform = getComputedStyle(imageWrapper)[transform];
       let iTransform = getComputedStyle(image)[transform];
-      imageWrapper.style[transform] = wTransform === 'none' ? iTransform : iTransform.concat(' ', wTransform);
+      // imageWrapper.style[transform] = (wTransform === 'none')
+      //   ? iTransform
+      //   : wTransform;
+      image.style[transform] = iTransform;
     },
     _getPosAndScale() {
       const targetWidth = 40; // 小图标宽度40

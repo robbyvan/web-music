@@ -3,7 +3,7 @@
     <!-- 轮播图 -->
     <scroll ref="scroll" class="recommend-content" :data="discList">
       <div>
-        <div v-if="recommends.length" class="slider-wrapper">
+        <div v-if="recommends.length" class="slide-wrapper">
           <slider>
             <div v-for="item in recommends" :key="item.id">
               <a :href="item.linkUrl">
@@ -73,20 +73,22 @@ export default {
       setDisc: 'SET_DISC',
     }),
     _getRecommend() {
-      getRecommend().then(res => {
-        if (res.code === ERR_OK) {
-          // console.log(res.data.slider);
-          this.recommends = res.data.slider;
-        }
-      });
+      getRecommend()
+        .then(res => {
+          if (res.code === ERR_OK) {
+            // console.log(res.data.slider);
+            this.recommends = res.data.slider;
+          }
+        });
     },
     _getList() {
-      getList().then(res => {
-        if (res.code === ERR_OK) {
-          this.discList = res.data.list;
-          // console.log(this.discList);
-        }
-      });
+      getList()
+        .then(res => {
+          if (res.code === ERR_OK) {
+            this.discList = res.data.list;
+            // console.log(this.discList);
+          }
+        });
     },
     imgLoaded() {
       if (!this.checkLoaded) {
@@ -115,10 +117,10 @@ export default {
 @import 'common/scss/mymixin.scss';
 
 .recommend {
-  position: fixed;
+  position: fixed; // 绝对定位
   width: 100%;
-  top: 88px;
-  bottom: 0;
+  top: 88px; // 两个tab的高度44x2
+  bottom: 0; // 设置0才能滑动
   .recommend-content {
     height: 100%;
     overflow: hidden;
@@ -141,7 +143,7 @@ export default {
         box-sizing: border-box;
         padding: 0 20px 20px 20px;
         .icon {
-          flex: 0 0 60px;
+          flex: 0 0 60px; // flex-grow: 0 保证仅60px宽
           width: 60px;
           padding-right: 20px;
         }
@@ -149,7 +151,7 @@ export default {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          flex: 1;
+          flex: 1; // 自动充满剩余flex部分
           line-height: 20px;
           overflow: hidden;
           font-size: $font-size-medium;
@@ -163,12 +165,7 @@ export default {
         }
       }
     }
-    .loading-container {
-      position: absolute;
-      width: 100%;
-      top: 50%;
-      transform: translateY(-50%);
-    }
   }
 }
+
 </style>
