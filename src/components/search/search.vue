@@ -157,10 +157,6 @@ export default {
           background: $color-highlight-background;
           font-size: $font-size-medium;
           color: $color-text-d;
-          &.special {
-            color: rgba(255, 255, 255, 0.7);
-            // border: 1px solid #fc4524;
-          }
         }
       }
       .search-history {

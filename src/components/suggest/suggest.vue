@@ -20,7 +20,7 @@
       <loading v-show="hasMore"></loading>
     </ul>
     <div class="no-result-wrapper" v-show="!hasMore && !result.length">
-      <no-result title="什么都没找到啊  (。・＿・。)ﾉ" />
+      <no-result :title="noResultTitle" />
     </div>
   </scroll>
 </template>
@@ -52,7 +52,15 @@ export default {
       hasMore: true,
       isLoading: false,
       beforeScroll: true,
+      copyright: false,
     };
+  },
+  computed: {
+    noResultTitle() {
+      return this.copyright
+        ? '版权受限, 请支持正版音乐⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄'
+        : '什么都没找到啊  (。・＿・。)ﾉ';
+    }
   },
   props: {
     query: { type: String, default: '' },
@@ -79,15 +87,23 @@ export default {
       this.hasMore = true;
       this.isLoading = true;
       this.$refs.suggest.scrollTo(0, 0);
-      search(this.query, this.page, this.showSinger, RESULT_PER_PAGE).then(res => {
-        this.isLoading = false;
-        if (res.code === ERR_OK) {
-          this._genResult(res.data).then((result) => {
-            this.result = result;
-            this._checkMore(res.data);
-          });
-        }
-      });
+      search(this.query, this.page, this.showSinger, RESULT_PER_PAGE)
+        .then(res => {
+          this.isLoading = false;
+          if (res.code === ERR_OK) {
+            this._genResult(res.data)
+              .then((result) => {
+                this.result = result;
+                this._checkMore(res.data);
+              })
+              .catch(e => {
+                // 版权导致的无法获取url.
+                this.result = [];
+                this.copyright = true;
+                this.hasMore = false;
+              });
+          }
+        });
     },
     searchMore() {
       if (this.isLoading) {
@@ -112,6 +128,7 @@ export default {
         });
     },
     _checkMore(data) {
+      this.copyright = false;
       const song = data.song;
       if (!song.list.length || (song.curnum + song.curpage * RESULT_PER_PAGE) > song.totalnum) {
         this.hasMore = false;
