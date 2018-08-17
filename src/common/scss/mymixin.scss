@@ -30,7 +30,7 @@
 // 扩展点击区域
 @mixin extend-click() {
   position: relative;
-  &:before {
+  &::before {
     content: '';
     position: absolute;
     top: -10px;
@@ -39,24 +39,3 @@
     bottom: -10px;
   }
 }
-
-// 占据全屏
-// position: fixed;
-// top: 0;
-// left: 0;
-// right: 0;
-// bottom: 0;
-
-// 垂直居中
-// .no-result-wrapper {
-//   position: absolute;
-//   width: 100%;
-//   top: 50%;
-//   transform: translateY(-50%);
-// }
-
-// 垂直居中
-// position: absolute;
-// top: 50%;
-// left: 50%;
-// transform: translate(-50%, -50%);

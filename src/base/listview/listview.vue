@@ -7,6 +7,7 @@
     :probeType="probeType"
     @scroll="scroll"
   >
+    <!-- 歌手列表 -->
     <ul>
       <li v-for="group in data" class="list-group" :key="group.title" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
@@ -23,6 +24,7 @@
         </ul>
       </li>
     </ul>
+    <!-- 字母导航 -->
     <div
       class="list-shortcut"
       @touchstart="onShortcutTouchStart"
@@ -39,9 +41,11 @@
         </li>
       </ul>
     </div>
+    <!-- 顶端fixed当前组别 -->
     <div class="list-fixed" v-show="fixedTitle" ref="fixed">
       <h1 class="fixed-title">{{ fixedTitle }}</h1>
     </div>
+    <!-- loading -->
     <div v-show="!data.length" class="loading-container">
       <loading />
     </div>

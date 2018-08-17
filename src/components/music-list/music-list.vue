@@ -93,7 +93,7 @@ export default {
         blur = Math.min(20 * percent, 20);
       }
       this.$refs.filter.style[backdrop] = `blur(${blur}px)`;
-      // this.$refs.filter.style['webkitBackdrop-filter'] = `blur(${blur}px)`;
+
       if (newY < this.minTranslateY) {
         zIndex = 10;
         this.$refs.bgImage.style.paddingTop = 0;
@@ -106,7 +106,6 @@ export default {
       }
       this.$refs.bgImage.style.zIndex = zIndex;
       this.$refs.bgImage.style[transform] = `scale(${scale})`;
-      // this.$refs.bgImage.style['webkitTransform'] = `scale(${scale})`;
     }
   },
   created() {
@@ -117,6 +116,7 @@ export default {
     this.imageHeight = this.$refs.bgImage.clientHeight;
     this.minTranslateY = -this.imageHeight + RESERVED_HEIGHT;
     this.$refs.songList.$el.style.top = `${this.$refs.bgImage.clientHeight}px`;
+    // console.log(`${this.$refs.bgImage.clientHeight}px`, this.$refs.bgImage, this.$refs.songList.$el);
   },
   methods: {
     ...mapActions([

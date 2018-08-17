@@ -66,14 +66,15 @@ export function processSongsUrl(songs) {
   if (!songs.length) {
     return Promise.resolve(songs);
   }
-  return getSongsUrl(songs).then((res) => {
-    if (res.code === ERR_OK) {
-      let midUrlInfo = res.url_mid.data.midurlinfo;
-      midUrlInfo.forEach((info, index) => {
-        let song = songs[index];
-        song.url = `http://dl.stream.qqmusic.qq.com/${info.purl}`;
-      });
-    }
-    return songs;
-  });
+  return getSongsUrl(songs)
+    .then((res) => {
+      if (res.code === ERR_OK) {
+        let midUrlInfo = res.url_mid.data.midurlinfo;
+        midUrlInfo.forEach((info, index) => {
+          let song = songs[index];
+          song.url = `http://dl.stream.qqmusic.qq.com/${info.purl}`;
+        });
+      }
+      return songs;
+    });
 }
