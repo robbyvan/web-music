@@ -1,5 +1,3 @@
-// @import 'common/scss/mymixin.scss';
-
 // 2x 3x 背景图片
 @mixin bg-image($name) {
   background-image: url($name + '@2x.png');
