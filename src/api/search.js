@@ -19,7 +19,7 @@ export function getHotKey() {
 
 // 搜索结果
 export function search(query, page, zhida, perpage) {
-  const url = debug ? '/api/search' : 'http://robbyvan.us/music/api/search';
+  const url = formatUrl('/api/search');
 
   const data = Object.assign({}, commonParams, {
     w: query,

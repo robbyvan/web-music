@@ -12,3 +12,8 @@ export const options = {
 };
 
 export const ERR_OK = 0;
+
+export function formatUrl(path) {
+  const debug = process.env.NODE_ENV !== 'production';
+  return debug ? path : `https://robbyvan.cn/music${path}`;
+}
