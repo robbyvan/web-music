@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const config = require('./config/index');
 
+const fs = require('fs');
 const https = require('https');
 const privateKey = fs.readFileSync('/etc/nginx/cert/2_robbyvan.cn.key', 'utf-8');
 const certificate = fs.readFileSync('/etc/nginx/cert/1_robbyvan.cn_bundle.crt', 'utf-8');
@@ -121,6 +122,6 @@ module.exports = httpsServer.listen(port, function(err) {
     console.log(err);
     return;
   }
-  console.log('App running at http://localhost:' + port + '\n');
+  console.log('App running at https://localhost:' + port + '\n');
 });
 
