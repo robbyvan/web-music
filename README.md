@@ -2,8 +2,9 @@
 > 一款移动端web music player🎵
 
 ## Demo
-🎵[在线预览: 移动端web-music](http://robbyvan.us/music/)<br />
-使用手机浏览器打开获得更佳体验~📱<br />
++ 🎵 [在线预览: 移动端web-music](https://robbyvan.cn/music)
++ 📱 使用手机浏览器打开获得更佳体验~
+
 ![](./qrcode/cli_300px.png)
 
 ### 推荐
